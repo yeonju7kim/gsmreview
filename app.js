@@ -6,6 +6,8 @@ const messageLabels = {
   thought: "성령의 생각을 따라 기쁨을 누리는 삶",
   church: "예수님을 닮아 새사람이 되는 삶",
   relationship: "관계 속에서 사랑을 구체적으로 살아내는 삶",
+  seminar: "선택식 강의 / 세미나",
+  smallGroup: "소그룹",
 };
 
 const progressSteps = {
@@ -61,7 +63,7 @@ function buildSubmissionBody(payload) {
     _honey: payload.website,
     _url: window.location.href,
     작성자: payload.name,
-    "기억에 남은 메시지": payload.messages.join(" / "),
+    "가장 기억에 남은 것": payload.messages.join(" / "),
     "마음에 남은 이유와 느낀 점": payload.reflection,
     "한 달 액션 포인트": payload.actionPoint,
     ...(payload.prayerRequest ? { "함께 기도받고 싶은 제목": payload.prayerRequest } : {}),
@@ -107,10 +109,15 @@ function validateReflection() {
   let valid = true;
 
   setError("message");
+  setError("seminarDetail");
   setError("reflection");
 
   if (!messages.length) {
-    setError("message", "가장 기억에 남는 메시지를 하나 이상 골라주세요.");
+    setError("message", "가장 기억에 남는 것을 하나 이상 골라주세요.");
+    valid = false;
+  }
+  if (messages.includes("seminar") && !valueOf("seminarDetail")) {
+    setError("seminarDetail", "선택한 강의나 세미나를 적어주세요.");
     valid = false;
   }
   if (!reflection) {
@@ -152,6 +159,15 @@ function selectedMessages() {
   return [...form.querySelectorAll('input[name="message"]:checked')].map((input) => input.value);
 }
 
+function selectedMessageLabels() {
+  const seminarDetail = valueOf("seminarDetail");
+  return selectedMessages().map((messageId) =>
+    messageId === "seminar" && seminarDetail
+      ? `${messageLabels[messageId]} — ${seminarDetail}`
+      : messageLabels[messageId],
+  );
+}
+
 function fullActionSentence() {
   const action = valueOf("actionPoint");
   if (!action) return "";
@@ -160,7 +176,7 @@ function fullActionSentence() {
 }
 
 function renderReview() {
-  const messages = selectedMessages().map((messageId) => messageLabels[messageId]);
+  const messages = selectedMessageLabels();
   document.querySelector("[data-review-message]").textContent = messages.join(" · ");
   document.querySelector("[data-review-action]").textContent = fullActionSentence();
   document.querySelector("[data-success-action]").textContent = fullActionSentence();
@@ -174,6 +190,16 @@ function renderReview() {
 document.querySelectorAll("[data-go]").forEach((button) => {
   button.addEventListener("click", () => showScreen(button.dataset.go));
 });
+
+const seminarCheckbox = form.querySelector('input[value="seminar"]');
+const seminarDetail = document.querySelector("[data-seminar-detail]");
+function syncSeminarDetail() {
+  seminarDetail.hidden = !seminarCheckbox.checked;
+  seminarCheckbox.setAttribute("aria-expanded", String(seminarCheckbox.checked));
+  if (!seminarCheckbox.checked) setError("seminarDetail");
+}
+seminarCheckbox.addEventListener("change", syncSeminarDetail);
+syncSeminarDetail();
 
 document.querySelector('[data-next="action"]').addEventListener("click", () => {
   if (validateReflection()) showScreen("action");
@@ -219,7 +245,8 @@ form.addEventListener("submit", async (event) => {
   const payload = {
     name: valueOf("name") || "익명",
     messageIds: selectedMessages(),
-    messages: selectedMessages().map((messageId) => messageLabels[messageId]),
+    messages: selectedMessageLabels(),
+    seminarDetail: valueOf("seminarDetail"),
     reflection: valueOf("reflection"),
     actionPoint: fullActionSentence(),
     prayerRequest: valueOf("prayerRequest"),
@@ -290,6 +317,7 @@ document.querySelector("[data-restart]").addEventListener("click", () => {
   document.querySelectorAll("[data-error]").forEach((error) => {
     error.textContent = "";
   });
+  syncSeminarDetail();
   showScreen("summary");
 });
 

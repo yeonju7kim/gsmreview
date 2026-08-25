@@ -6,6 +6,8 @@ const messageLabels = {
   thought: "성령의 생각을 따라 기쁨을 누리는 삶",
   church: "예수님을 닮아 새사람이 되는 삶",
   relationship: "관계 속에서 사랑을 구체적으로 살아내는 삶",
+  seminar: "선택식 강의 / 세미나",
+  smallGroup: "소그룹",
 };
 
 function sendJson(response, status, body) {
@@ -73,7 +75,7 @@ function buildEmail({ name, messages, reflection, actionPoint, prayerRequest, su
     `작성자: ${name}`,
     `제출 시각: ${formattedDate}`,
     "",
-    "[가장 기억에 남은 메시지]",
+    "[가장 기억에 남은 것]",
     ...messages.map((message) => `- ${message}`),
     "",
     "[마음에 남은 이유와 느낀 점]",
@@ -97,7 +99,7 @@ function buildEmail({ name, messages, reflection, actionPoint, prayerRequest, su
               <span style="color:#68716c;">${formattedDate}</span>
             </div>
 
-            <p style="margin:30px 0 10px;color:#68716c;font-size:11px;font-weight:700;">가장 기억에 남은 메시지</p>
+            <p style="margin:30px 0 10px;color:#68716c;font-size:11px;font-weight:700;">가장 기억에 남은 것</p>
             <ul style="margin:0;padding-left:20px;font-size:16px;line-height:1.8;">
               ${safeMessages.map((message) => `<li>${message}</li>`).join("")}
             </ul>
@@ -144,12 +146,22 @@ export default async function handler(request, response) {
     const actionPoint = cleanText(body.actionPoint, 300);
     const prayerRequest = cleanText(body.prayerRequest, 300);
     const respondentEmail = cleanEmail(body.respondentEmail);
+    const seminarDetail = cleanText(body.seminarDetail, 120);
     const messageIds = Array.isArray(body.messageIds)
-      ? [...new Set(body.messageIds.filter((id) => Object.hasOwn(messageLabels, id)))].slice(0, 5)
+      ? [...new Set(body.messageIds.filter((id) => Object.hasOwn(messageLabels, id)))].slice(0, 7)
       : [];
-    const messages = messageIds.map((id) => messageLabels[id]);
+    const messages = messageIds.map((id) =>
+      id === "seminar" && seminarDetail
+        ? `${messageLabels[id]} — ${seminarDetail}`
+        : messageLabels[id],
+    );
 
-    if (!messages.length || !reflection || !actionPoint) {
+    if (
+      !messages.length ||
+      !reflection ||
+      !actionPoint ||
+      (messageIds.includes("seminar") && !seminarDetail)
+    ) {
       sendJson(response, 400, { ok: false, error: "INVALID_SUBMISSION" });
       return;
     }

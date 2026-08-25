@@ -40,6 +40,7 @@ API 키가 비어 있는 로컬 환경에서는 안전하게 시안 확인 모�
 - `name`: 이름 또는 `익명`
 - `messageIds`: 선택한 메시지 ID 목록
 - `messages`: 선택한 메시지 제목 목록
+- `seminarDetail`: 선택한 강의나 세미나 이름(해당 항목 선택 시)
 - `reflection`: 마음에 남은 이유와 느낀 점
 - `actionPoint`: 한 달 액션 포인트
 - `prayerRequest`: 함께 기도받고 싶은 제목(선택)

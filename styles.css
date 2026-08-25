@@ -553,6 +553,18 @@ textarea:focus-visible {
   font-weight: 750;
 }
 
+.conditional-field label > span em {
+  margin-right: 5px;
+  color: var(--coral);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 650;
+}
+
+.conditional-field label > span strong {
+  font-weight: 800;
+}
+
 .conditional-field input {
   width: 100%;
   height: 52px;

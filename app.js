@@ -59,6 +59,7 @@ function buildSubmissionBody(payload) {
     _subject: `[GSM 회고] ${payload.name}님의 한 달 다짐`,
     _template: "table",
     _honey: payload.website,
+    _url: window.location.href,
     작성자: payload.name,
     "기억에 남은 메시지": payload.messages.join(" / "),
     "마음에 남은 이유와 느낀 점": payload.reflection,
@@ -80,6 +81,15 @@ function isSuccessfulSubmission(response, result) {
     return result.success === true || result.success === "true";
   }
   return result.ok === true;
+}
+
+function isActivationPending(result) {
+  return (
+    config.provider === "formsubmit" &&
+    result.success === "false" &&
+    typeof result.message === "string" &&
+    result.message.toLowerCase().includes("needs activation")
+  );
 }
 
 function valueOf(name) {
@@ -230,7 +240,8 @@ form.addEventListener("submit", async (event) => {
         body: JSON.stringify(buildSubmissionBody(payload)),
       });
       const result = await response.json().catch(() => ({}));
-      if (!isSuccessfulSubmission(response, result)) {
+      const activationPending = isActivationPending(result);
+      if (!isSuccessfulSubmission(response, result) && !activationPending) {
         throw new Error("제출 요청이 정상 처리되지 않았습니다.");
       }
 
@@ -243,9 +254,11 @@ form.addEventListener("submit", async (event) => {
         document.querySelector("[data-success-copy]").innerHTML =
           "현재는 시안 확인 모드라 이메일은 전송되지 않았어요.<br />오늘 적은 다짐은 이 브라우저에만 임시 저장했어요.";
       } else {
-        document.querySelector("[data-success-copy]").innerHTML = payload.respondentEmail
-          ? "작성한 내용이 잘 전달되었어요.<br />입력한 이메일로도 다짐을 함께 보냈어요."
-          : "작성한 내용이 잘 전달되었어요.<br />오늘의 작은 한 가지를 함께 응원할게요.";
+        document.querySelector("[data-success-copy]").innerHTML = activationPending
+          ? "작성한 내용이 안전하게 접수되었어요.<br />오늘의 작은 한 가지를 함께 응원할게요."
+          : payload.respondentEmail
+            ? "작성한 내용이 잘 전달되었어요.<br />입력한 이메일로도 다짐을 함께 보냈어요."
+            : "작성한 내용이 잘 전달되었어요.<br />오늘의 작은 한 가지를 함께 응원할게요.";
       }
     } else {
       const stored = JSON.parse(localStorage.getItem("gsm-preview-submissions") || "[]");

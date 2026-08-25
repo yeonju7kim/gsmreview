@@ -66,7 +66,7 @@ function buildSubmissionBody(payload) {
     "가장 기억에 남은 것": payload.messages.join(" / "),
     "마음에 남은 이유와 느낀 점": payload.reflection,
     "한 달 액션 포인트": payload.actionPoint,
-    ...(payload.prayerRequest ? { "함께 기도받고 싶은 제목": payload.prayerRequest } : {}),
+    "함께 기도받고 싶은 제목": payload.prayerRequest,
     ...(payload.respondentEmail
       ? { email: payload.respondentEmail, _cc: payload.respondentEmail }
       : {}),
@@ -150,6 +150,17 @@ function validateOptionalEmail() {
   if (emailField.value.trim() && !emailField.validity.valid) {
     setError("respondentEmail", "이메일 주소를 올바른 형식으로 적어주세요.");
     emailField.focus();
+    return false;
+  }
+  return true;
+}
+
+function validatePrayerRequest() {
+  const prayerField = form.elements.prayerRequest;
+  setError("prayerRequest");
+  if (!prayerField.value.trim()) {
+    setError("prayerRequest", "서로 함께 기도할 수 있도록 기도 제목을 한 가지 적어주세요.");
+    prayerField.focus();
     return false;
   }
   return true;
@@ -240,6 +251,7 @@ form.addEventListener("submit", async (event) => {
     showScreen(!validateReflection() ? "reflection" : "action");
     return;
   }
+  if (!validatePrayerRequest()) return;
   if (!validateOptionalEmail()) return;
 
   const payload = {

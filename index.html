@@ -369,15 +369,18 @@
           </article>
 
           <label class="text-field prayer-field">
-            <span>함께 기도받고 싶은 제목 <small>선택</small></span>
+            <span>함께 기도받고 싶은 제목 <small>필수</small></span>
+            <p>서로를 아직 잘 몰라도 함께 기도할 수 있도록, 한 가지 이상 구체적으로 적어주세요.</p>
             <textarea
               name="prayerRequest"
               rows="3"
               maxlength="300"
-              placeholder="함께 기도받고 싶은 것이 있다면 한 문장으로 편하게 적어주세요."
+              placeholder="예: 새로운 환경에서도 매일 말씀과 기도 시간을 지킬 수 있도록 기도해주세요."
+              required
             ></textarea>
             <small><span data-count="prayerRequest">0</span> / 300</small>
           </label>
+          <p class="field-error" data-error="prayerRequest" role="alert"></p>
 
           <label class="name-field">
             <span>이름 또는 별명 <small>선택</small></span>

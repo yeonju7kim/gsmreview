@@ -160,6 +160,7 @@ export default async function handler(request, response) {
       !messages.length ||
       !reflection ||
       !actionPoint ||
+      !prayerRequest ||
       (messageIds.includes("seminar") && !seminarDetail)
     ) {
       sendJson(response, 400, { ok: false, error: "INVALID_SUBMISSION" });

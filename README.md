@@ -43,6 +43,6 @@ API 키가 비어 있는 로컬 환경에서는 안전하게 시안 확인 모�
 - `seminarDetail`: 선택한 강의나 세미나 이름(해당 항목 선택 시)
 - `reflection`: 마음에 남은 이유와 느낀 점
 - `actionPoint`: 한 달 액션 포인트
-- `prayerRequest`: 함께 기도받고 싶은 제목(선택)
+- `prayerRequest`: 함께 기도받고 싶은 제목(필수)
 - `respondentEmail`: 본인 다짐 사본을 받을 이메일 주소(선택)
 - `submittedAt`: 제출 시각

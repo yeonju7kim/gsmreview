@@ -61,7 +61,7 @@ function buildSubmissionBody(payload) {
     _subject: `[GSM 회고] ${payload.name}님의 한 달 다짐`,
     _template: "table",
     _honey: payload.website,
-    _url: window.location.href,
+    _url: new URL("./", window.location.href).href,
     작성자: payload.name,
     "가장 기억에 남은 것": payload.messages.join(" / "),
     "마음에 남은 이유와 느낀 점": payload.reflection,
